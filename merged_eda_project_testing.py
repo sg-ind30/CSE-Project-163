@@ -1,5 +1,5 @@
 """
-Name: Shripad Guntur
+Tanisha, Shripad, Yuktha
 CSE 163
 Autumn 2026
 EDA Project 2 - NHIS 2023 Testing
@@ -14,7 +14,7 @@ import os
 
 import pandas as pd
 
-from combined_eda_project import (
+from merged_eda_project_2 import (
     # NHIS 2023
     filter_diabetes,
     clean_data,

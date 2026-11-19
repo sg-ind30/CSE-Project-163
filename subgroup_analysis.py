@@ -27,12 +27,12 @@ print("Missing Patient Values:", missing_values_patients)
 # Value Counts 
 print(patients["DIABDX_M18"].value_counts())
 
-filtered_data =  patients[(patients["DIABDX_M18"] == 1) & 
+filtered_data_patients =  patients[(patients["DIABDX_M18"] == 1) & 
 (patients["AGE24X"] >= 18) & 
 (patients["PERWT24F"] > 0)
 ]
 
-print(filtered_data.shape)
+print(filtered_data_patients.shape)
 
 # Conditions Dataset 
 diabetes_codes = ["E08","E09","E10","E11","E13"]
@@ -46,3 +46,15 @@ print(filtered_data_conditions["ICD10CDX"].value_counts())
 unique_conditions = filtered_data_conditions.drop_duplicates(subset=["DUPERSID"])
 
 print(unique_conditions)
+
+# Merging Datasets 
+
+merged_data = filtered_data_patients.merge(unique_conditions, on="DUPERSID", how="inner")
+print(merged_data)
+
+print(merged_data["DUPERSID"].nunique())
+print(merged_data.isna().sum())
+print(merged_data["POVCAT24"].value_counts())
+print(merged_data["INSCOV24"].value_counts())
+print(merged_data["TOTEXP24"].min())
+print(merged_data["TOTSLF24"].min())

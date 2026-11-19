@@ -58,3 +58,56 @@ print(merged_data["POVCAT24"].value_counts())
 print(merged_data["INSCOV24"].value_counts())
 print(merged_data["TOTEXP24"].min())
 print(merged_data["TOTSLF24"].min())
+
+print(merged_data[["AGE24X","TOTEXP24","TOTSLF24"]].describe())
+
+merged_data["Age_Group"] = pd.cut(
+    merged_data["AGE24X"],
+    bins = [18,44,64,85],
+    labels = ["Young Adults", "Middle Aged Adults", "Older Adults"],
+    include_lowest=True
+)
+print(merged_data["Age_Group"].value_counts())
+
+income_labels = {
+    1: "Poor",
+    2: "Near Poor",
+    3: "Low Income",
+    4: "Middle Income",
+    5: "High Income"
+    
+}
+
+insurance_labels = {
+    1: "Private Insurance",
+    2: "Public Insurance",
+    3: "Uninsured"
+}
+
+merged_data["Income_Group"] = merged_data["POVCAT24"].map(income_labels)
+merged_data["Insurance_Group"] = merged_data["INSCOV24"].map(insurance_labels)
+
+print(merged_data["Income_Group"].value_counts())
+print(merged_data["Insurance_Group"].value_counts())
+
+income_age_spending = merged_data.groupby(["Age_Group","Income_Group"])[["TOTEXP24","TOTSLF24"]].mean()
+
+print(income_age_spending)
+
+income_insurance_spending = merged_data.groupby(["Insurance_Group","Income_Group"])[["TOTEXP24","TOTSLF24"]].mean()
+
+print(income_insurance_spending)
+
+income_age_count = merged_data.groupby(["Age_Group","Income_Group"]).size()
+
+income_insurance_count = merged_data.groupby(["Insurance_Group","Income_Group"]).size()
+
+print(income_age_count)
+print(income_insurance_count)
+
+merged_data["Weighted_Total_Expenditure"] = merged_data["TOTEXP24"] * merged_data["PERWT24F"]
+
+merged_data["Weighted_Out_Of_Pocket_Expenditure"] = merged_data["TOTSLF24"] * merged_data["PERWT24F"]
+
+print(merged_data["Weighted_Total_Expenditure"].head())
+print(merged_data["Weighted_Out_Of_Pocket_Expenditure"].head())

@@ -49,6 +49,7 @@ def test_clean_data():
     are converted into missing values.
     """
     data = pd.DataFrame({
+        "AGEP_A": [25, 65, 97],
         "DIBEV_A": [1, 1, 1],
         "HICOV_A": [1, 2, 9],
         "MEDDL12M_A": [1, 2, 8],
@@ -65,6 +66,8 @@ def test_clean_data():
     assert result["MEDNG12M_A"].isna().sum() == 1
     assert result["RXDG12M_A"].isna().sum() == 1
     assert result["RXSK12M_A"].isna().sum() == 1
+    assert result["AGEP_A"].isna().sum() == 1
+    assert result["AGEP_A"].iloc[0] == 25
 
 
 def test_categorize_data():

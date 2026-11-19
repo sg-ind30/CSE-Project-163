@@ -8,6 +8,7 @@
 
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import chi2_contingency
 
 DATA_FILE = "datasets/adult23.csv"
 
@@ -95,8 +96,8 @@ def summarize_data(data):
 
 def clean_data(data):
     """
-    Converts invalid categorical survey responses into missing
-    values while retaining valid responses for each participant.
+    Converts invalid categorical responses and age codes
+    into missing values while retaining valid responses.
     """
     result = data.copy()
 
@@ -104,6 +105,10 @@ def clean_data(data):
         result[variable] = result[variable].where(
             result[variable].isin([1, 2])
         )
+
+    result["AGEP_A"] = result["AGEP_A"].where(
+        result["AGEP_A"].between(18, 85)
+    )
 
     print("\nMissing Values After Cleaning:")
     print(result.isna().sum())
@@ -300,6 +305,36 @@ def summarize_subgroups(data):
         ]].count()
     )
 
+def validate_rq3(data):
+    """
+    Checks the expected frequency assumption for chi-square
+    tests of income and cost-related medical care barriers.
+    """
+    outcomes = ["Delayed_Care", "Forgone_Care"]
+
+    for outcome in outcomes:
+        table = pd.crosstab(
+            data["Income_Group"],
+            data[outcome]
+        )
+
+        chi2, p_value, dof, expected = chi2_contingency(table)
+
+        print("\nRQ3 Result Validity:", outcome)
+
+        print("Observed Frequencies:")
+        print(table)
+
+        print("Expected Frequencies:")
+        print(expected)
+
+        print("Minimum Expected Frequency:", expected.min())
+        print("All Expected Frequencies >= 5:",
+              (expected >= 5).all())
+
+        print("Chi-square Statistic:", chi2)
+        print("Degrees of Freedom:", dof)
+        print("P-value:", p_value)
 
 def main():
     """
@@ -316,6 +351,9 @@ def main():
 
     diabetes_data = clean_data(diabetes_data)
 
+    print("\nCleaned Quantitative Summary:")
+    print(diabetes_data[QUANTITATIVE_VARIABLES].describe())
+
     diabetes_data = categorize_data(diabetes_data)
 
     plot_income_insurance_barriers(diabetes_data)
@@ -323,6 +361,8 @@ def main():
     plot_age_prescription_barriers(diabetes_data)
 
     summarize_subgroups(diabetes_data)
+
+    validate_rq3(diabetes_data)
 
 
 if __name__ == "__main__":
